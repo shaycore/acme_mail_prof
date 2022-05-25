@@ -1,0 +1,57 @@
+const Sequelize = require('sequelize');
+const { STRING } = Sequelize;
+const conn = new Sequelize(process.env.DATABASE_URL || 'postgres://localhost/acme_mail_db');
+
+const User = conn.define('user', {
+  firstName: {
+    type: STRING,
+    allowNull: false,
+    validate: {
+      notEmpty: true
+    }
+  },
+  lastName: {
+    type: STRING,
+    allowNull: false,
+    validate: {
+      notEmpty: true
+    }
+  }
+
+});
+const Message = conn.define('message', {
+  subject: {
+    type: STRING,
+    allowNull: false,
+    validate: {
+      notEmpty: true
+    }
+  }
+});
+
+const syncAndSeed = async()=> {
+  await conn.sync({ force: true }); 
+  const [ moe, larry, lucy, ethyl ] = await Promise.all(
+    [
+      { firstName: 'moe', lastName: 'green'},
+      { firstName: 'larry', lastName: 'lubin'},
+      { firstName: 'lucy', lastName: 'lasser'},
+      { firstName: 'ethyl', lastName: 'evans'},
+    ].map( user => User.create(user))
+  );
+  const [ hi, bye, hello ] = await Promise.all(
+    [
+      { subject: 'hi' },
+      { subject: 'bye' },
+      { subject: 'hello' },
+    ].map( message => Message.create(message))
+  );
+};
+
+
+module.exports = {
+  conn,
+  User,
+  Message,
+  syncAndSeed
+};

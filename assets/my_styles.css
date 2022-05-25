@@ -1,0 +1,15 @@
+body {
+  font-family: verdana;
+}
+
+nav {
+  display: flex;
+  justify-content: space-around;
+}
+
+nav a {
+  padding: 0.5rem;
+}
+nav a.selected {
+  border: solid 1px dodgerBlue;
+}
