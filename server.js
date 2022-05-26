@@ -55,7 +55,42 @@ app.get('/users', async(req, res, next)=> {
               users.map( user => {
                 return `
                   <li>
-                    ${ user.firstName } ${ user.lastName }
+                    ${ user.fullName } (${ user.userLevel })
+                  </li>
+                `;
+              }).join('')
+            }
+          </ul>
+        </body>
+      </html>
+    `);
+  }
+  catch(ex){
+    next(ex);
+  }
+});
+
+app.get('/messages', async(req, res, next)=> {
+  try {
+    const messages = await Message.findAll();
+    res.send(`
+      <html>
+        <head>
+          <title>Acme Mail</title>
+          <link rel='stylesheet' href='/assets/my_styles.css' />
+        </head>
+        <body>
+          <nav>
+            <a href='/'>Home</a>
+            <a href='/users'>Users</a>
+            <a href='/messages' class='selected'>Messages</a>
+          </nav>
+          <ul>
+            ${
+              messages.map( message => {
+                return `
+                  <li>
+                    ${ message.subject }
                   </li>
                 `;
               }).join('')
