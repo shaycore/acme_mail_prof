@@ -30,6 +30,21 @@ const User = conn.define('user', {
   }
 
 });
+
+//Class Method
+User.getPowerUsers = function() {
+  return User.findAll({
+    where: {
+      userLevel: 'POWER'
+    },
+    include: [
+      { model: Message, as: 'sent' },
+      { model: Message, as: 'received' }
+    ]
+  });
+}
+//THIS is a promise! It returns a promise! whoever is using this code will need to use an 'await' before it.
+
 const Message = conn.define('message', {
   subject: {
     type: STRING,
@@ -39,6 +54,13 @@ const Message = conn.define('message', {
     }
   }
 });
+
+Message.belongsTo(User, { as: 'from' });
+Message.belongsTo(User, { as: 'to' });
+User.hasMany(Message, {as: 'sent', foreignKey: 'fromId'});
+User.hasMany(Message, {as: 'received', foreignKey: 'toId'});
+
+
 
 const syncAndSeed = async()=> {
   await conn.sync({ force: true }); 
@@ -52,9 +74,9 @@ const syncAndSeed = async()=> {
   );
   const [ hi, bye, hello ] = await Promise.all(
     [
-      { subject: 'hi' },
-      { subject: 'bye' },
-      { subject: 'hello' },
+      { subject: 'hi', fromId: moe.id, toId: lucy.id },
+      { subject: 'bye', fromId: lucy.id, toId: moe.id  },
+      { subject: 'hello', fromId: ethyl.id, toId: larry.id  },
     ].map( message => Message.create(message))
   );
 };
